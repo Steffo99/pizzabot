@@ -1,6 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy import Column, BigInteger, Integer, String, ForeignKey, create_engine
+from sqlalchemy import Column, BigInteger, Integer, String, Numeric, ForeignKey, create_engine
+import decimal
 
 # Init the sqlalchemy engine
 engine = create_engine("postgres://steffo:HIDDENPASSWORD@royal.steffo.eu:5432/pizzadev")
@@ -30,3 +31,21 @@ class TelegramUser(Base):
 
     def __repr__(self):
         return f"<User #{self.tid}>"
+
+
+class Pizza(Base):
+    """Data for a pizza type"""
+    __tablename__ = "pizza"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, unique=True)
+    details = Column(String)
+    price = Column(Numeric, scale=2, nullable=False)
+
+    def __str__(self, full=False):
+        if full:
+            return f"{self.name} [{self.price}]\n{self.details}"
+        return f"{self.name} [{self.price}]"
+
+    def __repr__(self):
+        return f"<Pizza #{self.id}>"
