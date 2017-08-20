@@ -1,7 +1,7 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-from sqlalchemy import Column, BigInteger, Integer, String, Numeric, ForeignKey, create_engine
-import decimal
+from sqlalchemy.orm import sessionmaker, relationship, composite
+from sqlalchemy import Column, BigInteger, Integer, String, Numeric, DateTime, ForeignKey, Float, create_engine
+from dbcomposites import Coordinates
 
 # Init the sqlalchemy engine
 engine = create_engine("postgres://steffo:HIDDENPASSWORD@royal.steffo.eu:5432/pizzadev")
@@ -49,3 +49,40 @@ class Pizza(Base):
 
     def __repr__(self):
         return f"<Pizza #{self.id}>"
+
+
+class PizzaSelection(Base):
+    """Data for a single pizza placed in a order"""
+    __tablename__ = "pizzaselection"
+
+    order_id = Column(Integer, ForeignKey("orders.id"), primary_key=True)
+    pizza_id = Column(Integer, ForeignKey("pizza.id"), primary_key=True)
+    pizza = relationship("Pizza")
+
+    notes = Column(String)
+
+    def __repr__(self):
+        return "<PizzaSelection of Pizza #{self.pizza_id} in Order #{self.order_id}>"
+
+
+class Order(Base):
+    """Data for a pizza order"""
+    __tablename__ = "orders"
+
+    id = Column(Integer, primary_key=True)
+    creation_time = Column(DateTime, nullable=False)
+    requested_time = Column(DateTime)
+    delivery_time = Column(DateTime)
+    notes = Column(String)
+
+    delivery_long = Column(Float, nullable=False)
+    delivery_lat = Column(Float, nullable=False)
+    delivery_location = composite(Coordinates, delivery_long, delivery_lat)
+
+    user_id = Column(Integer, ForeignKey("tusers.id"))
+    user = relationship("TelegramUser")
+
+    pizzas = relationship("PizzaSelection")
+
+    def __repr__(self):
+        return f"<Order #{self.id}>"
