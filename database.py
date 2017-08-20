@@ -73,6 +73,7 @@ class Order(Base):
     creation_time = Column(DateTime, nullable=False)
     requested_time = Column(DateTime)
     delivery_time = Column(DateTime)
+    completed_time = Column(DateTime)
     notes = Column(String)
 
     delivery_long = Column(Float, nullable=False)
